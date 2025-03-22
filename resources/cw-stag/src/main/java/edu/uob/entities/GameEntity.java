@@ -1,4 +1,9 @@
-package edu.uob;
+package edu.uob.entities;
+
+/**
+ * Abstract base class
+ * providing basic attributes such as name and description
+ */
 
 public abstract class GameEntity
 {

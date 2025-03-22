@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.actions;
 
 public class GameAction
 {
