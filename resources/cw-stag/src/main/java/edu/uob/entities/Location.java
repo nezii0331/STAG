@@ -1,6 +1,5 @@
 package edu.uob.entities;
 
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,7 +9,7 @@ public class Location extends GameEntity{
     private Set<String> paths;
     private Set<Artefact> artefacts;
     private Set<Furniture> furniture;
-    private Set<Character> characters;
+    private Set<GameCharacter> characters;
     private Set<Player> players;
 
 // === Constructor === //
@@ -55,11 +54,11 @@ public class Location extends GameEntity{
         return this.furniture;
     }
 
-    public void addCharacter(Character character){
+    public void addCharacter(GameCharacter character){
         this.characters.add(character);
     }
 
-    public Set<Character> getCharacters(){
+    public Set<GameCharacter> getCharacters(){
         return this.characters;
     }
 

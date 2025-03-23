@@ -1,7 +1,7 @@
 package edu.uob;
 
 import edu.uob.entities.*;
-import edu.uob.entities.Character;
+import edu.uob.entities.GameCharacter;
 import org.junit.jupiter.api.Test;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,7 +24,7 @@ class EntitiesTests {
 
     @Test
     void testCharacterBasic(){
-        Character elf = new Character("elf", "Angry Elf");
+        GameCharacter elf = new GameCharacter("elf", "Angry Elf");
         assertEquals("elf", elf.getName());
         assertEquals("Angry Elf", elf.getDescription());
     }

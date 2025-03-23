@@ -1,5 +1,8 @@
 package edu.uob;
 
+import edu.uob.entities.Location;
+import edu.uob.games.GameWorld;
+import edu.uob.parsers.EntityParser;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
@@ -11,8 +14,7 @@ import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
 
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 final class EntitiesFileTests {
 
@@ -51,4 +53,18 @@ final class EntitiesFileTests {
       }
   }
 
+  // MY test for EntityParser
+  @Test
+  void testEntityParserCreatesCorrectWorld() {
+      EntityParser parser = new EntityParser();
+      File file = new File("config/basic-entities.dot");
+      GameWorld world = parser.parseEntities(file);
+
+      Location cabin = world.getLocation("cabin");
+      assertNotNull(cabin);
+      assertEquals("A log cabin in the woods", cabin.getDescription());
+
+      assertTrue(cabin.getPaths().contains("forest"));
+      assertEquals(2, cabin.getArtefacts().size());
+  }
 }

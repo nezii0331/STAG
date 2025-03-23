@@ -1,5 +1,7 @@
 package edu.uob.entities;
 
+import java.lang.Character;
+
 /**
  * Abstract base class
  * providing basic attributes such as name and description
