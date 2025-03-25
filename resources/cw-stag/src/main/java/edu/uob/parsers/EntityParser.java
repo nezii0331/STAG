@@ -28,7 +28,7 @@ public class EntityParser {
             FileReader reader = new FileReader(entitiesFile);
             parser.parse(reader);
 
-            // Get the root
+            // Get the root from files
             Graph root = parser.getGraphs().get(0);
 
             //get subgraph

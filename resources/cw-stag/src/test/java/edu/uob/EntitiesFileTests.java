@@ -54,6 +54,7 @@ final class EntitiesFileTests {
   }
 
   // MY test for EntityParser
+    /// ============check=========== ///
   @Test
   void testEntityParserCreatesCorrectWorld() {
       EntityParser parser = new EntityParser();

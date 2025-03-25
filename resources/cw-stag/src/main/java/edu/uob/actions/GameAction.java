@@ -1,5 +1,4 @@
 package edu.uob.actions;
 
-public class GameAction
-{
+public class GameAction {
 }
