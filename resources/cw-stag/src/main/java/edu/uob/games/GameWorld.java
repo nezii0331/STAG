@@ -1,8 +1,11 @@
 package edu.uob.games;
 
+import edu.uob.actions.GameAction;
 import edu.uob.entities.Location;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Manage all location and entity data
@@ -10,9 +13,11 @@ import java.util.Map;
 
 public class GameWorld {
     private Map<String, Location> locations;
+    private Set<GameAction> actions;
 
     public GameWorld(){
         this.locations = new HashMap<>();
+        this.actions = new HashSet<>();
     }
 
     public void addLocation(Location location){
@@ -22,4 +27,14 @@ public class GameWorld {
     public Location getLocation(String name){
         return this.locations.get(name);
     }
+
+    public void addAction(GameAction action){
+        this.actions.add(action);
+    }
+
+    public Set<GameAction> getAllActions(){
+        return this.actions;
+    }
+
+
 }

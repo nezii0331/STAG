@@ -1,5 +1,12 @@
 package edu.uob;
 
+import edu.uob.actions.CustomAction;
+import edu.uob.actions.GameAction;
+import edu.uob.games.GameState;
+import edu.uob.games.GameWorld;
+import edu.uob.parsers.ActionParser;
+import edu.uob.parsers.EntityParser;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,6 +16,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
+import java.util.Set;
 
 public final class GameServer {
 
@@ -21,6 +29,10 @@ public final class GameServer {
         server.blockingListenOn(8888);
     }
 
+    //====check====
+    private GameWorld world;
+    private GameState state;
+
     /**
     * Do not change the following method signature or we won't be able to mark your submission
     * Instanciates a new server instance, specifying a game with some configuration files
@@ -30,6 +42,21 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
+
+        // create parser
+        EntityParser entityparser = new EntityParser();
+        ActionParser actionparser = new ActionParser();
+
+        // read entity file, add GameWorld
+        this.world = entityparser.parseEntities(entitiesFile);
+        // read action file
+        Set<CustomAction> actions = actionparser.parseAction(actionsFile);
+        // put every action file into GameWorld
+        for (GameAction action : actions) {
+            world.addAction(action);
+        }
+        // create GameState
+        this.state = new GameState();
     }
 
     /**
@@ -40,7 +67,11 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-        return "";
+       String[] parts = command.split(":");
+       String playerName = parts[0].trim().toLowerCase();
+       String playerCommand = parts[1].trim().toLowerCase();
+
+       return String.format("Command recived: %s from player %s", playerCommand, playerName);
     }
 
     /**

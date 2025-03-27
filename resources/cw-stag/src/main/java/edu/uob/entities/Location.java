@@ -69,4 +69,12 @@ public class Location extends GameEntity{
     public Set<Player> getPlayers(){
         return this.players;
     }
+
+    public Set<GameEntity> getEntities() {
+        Set<GameEntity> allEntities = new HashSet<>();
+        allEntities.addAll(this.artefacts);
+        allEntities.addAll(this.furniture);
+        allEntities.addAll(this.characters);
+        return allEntities;
+    }
 }
