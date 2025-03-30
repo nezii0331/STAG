@@ -2,6 +2,7 @@ package edu.uob;
 
 import edu.uob.actions.CustomAction;
 import edu.uob.actions.GameAction;
+import edu.uob.games.GameController;
 import edu.uob.games.GameState;
 import edu.uob.games.GameWorld;
 import edu.uob.parsers.ActionParser;
@@ -32,6 +33,7 @@ public final class GameServer {
     //====check====
     private GameWorld world;
     private GameState state;
+    private GameController controller;
 
     /**
     * Do not change the following method signature or we won't be able to mark your submission
@@ -42,7 +44,6 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
-
         // create parser
         EntityParser entityparser = new EntityParser();
         ActionParser actionparser = new ActionParser();
@@ -57,6 +58,7 @@ public final class GameServer {
         }
         // create GameState
         this.state = new GameState();
+        this.controller = new GameController(world, state);
     }
 
     /**
@@ -67,11 +69,7 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-       String[] parts = command.split(":");
-       String playerName = parts[0].trim().toLowerCase();
-       String playerCommand = parts[1].trim().toLowerCase();
-
-       return String.format("Command recived: %s from player %s", playerCommand, playerName);
+        return controller.handleCommand(command);
     }
 
     /**

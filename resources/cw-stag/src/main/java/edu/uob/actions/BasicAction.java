@@ -23,7 +23,7 @@ public class BasicAction {
 
         // return to player current Artefacts、Furniture、Characters
         for (GameEntity entity: currentLocation.getEntities()){
-            sb.append(String.format("There is a %s here - %s%n", entity.getName(), entity.getDescription()));
+            sb.append(String.format("There is a %s here - %s%n .", entity.getName(), entity.getDescription()));
         }
 
         // TODO: other player who's here

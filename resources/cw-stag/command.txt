@@ -1,0 +1,25 @@
+# Basic commands
+alice: look
+alice: inventory
+alice: get axe
+alice: look
+alice: inventory
+alice: drop axe
+alice: look
+alice: goto forest
+alice: look
+alice: goto cabin
+
+# Invalid commands
+bob: fly away
+bob: get unicorn
+bob: drop key
+
+# Multi-user test
+bob: look
+bob: get key
+alice: look
+
+# Custom action
+alice: chop tree
+alice: dig ground

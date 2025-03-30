@@ -77,4 +77,34 @@ public class Location extends GameEntity{
         allEntities.addAll(this.characters);
         return allEntities;
     }
+
+    public void addEntity(GameEntity entity) {
+        //if this is artefact
+        if (entity instanceof Artefact) {
+            artefacts.add((Artefact)entity);
+        }
+        //if this is furniture
+        if (entity instanceof Furniture) {
+            furniture.add((Furniture)entity);
+        }
+        //if this is character
+        if (entity instanceof GameCharacter) {
+            characters.add((GameCharacter)entity);
+        }
+    }
+
+    public void removeEntity(GameEntity entity){
+        //if this is artefact
+        if(entity instanceof Artefact){
+            artefacts.remove(entity);
+        }
+        //if this is furniture
+        if(entity instanceof Furniture){
+            furniture.remove(entity);
+        }
+        //if this is character
+        if(entity instanceof GameCharacter){
+            characters.remove(entity);
+        }
+    }
 }

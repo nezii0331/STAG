@@ -1,6 +1,7 @@
 package edu.uob.games;
 
 import edu.uob.actions.GameAction;
+import edu.uob.entities.GameEntity;
 import edu.uob.entities.Location;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,5 +37,16 @@ public class GameWorld {
         return this.actions;
     }
 
-
+    //implement found their name in this world
+    public GameEntity findEntityByName(String name){
+        for(Location location: locations.values()){
+            for(GameEntity entity: location.getEntities()){
+                if(entity.getName().equalsIgnoreCase(name)){
+                    //if found it return this item to used
+                    return entity;
+                }
+            }
+        }
+        return null;
+    }
 }
