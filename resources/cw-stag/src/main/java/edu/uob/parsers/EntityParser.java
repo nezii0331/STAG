@@ -11,14 +11,20 @@ import com.alexmerz.graphviz.objects.Edge;
 import edu.uob.entities.Location;
 import java.io.FileReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import com.alexmerz.graphviz.ParseException;
 
 /**
  * Parse .dot to create entities
  */
-
 public class EntityParser {
     public GameWorld parseEntities(File entitiesFile){
         try {
+            if (!entitiesFile.exists()) {
+                System.err.println("File not found: " + entitiesFile.getAbsolutePath());
+                return null;
+            }
+
             GameWorld world = new GameWorld();
             // Build parser
             Parser parser = new Parser();
@@ -34,13 +40,12 @@ public class EntityParser {
             //get subgraph
             Graph locationSection = root.getSubgraphs().get(0);
             for (Graph location : locationSection.getSubgraphs()) {
-
                 Node locationNode = location.getNodes(false).get(0);
                 String name = locationNode.getId().getId();
                 String description = locationNode.getAttribute("description");
 
-                Location loc = new Location(name, description); // Create location object
-                world.addLocation(loc);  // Add to the Map in GameWorld
+                Location loc = new Location(name, description);
+                world.addLocation(loc);
 
                 System.out.printf("Location: %s\n", name);
                 System.out.printf("Description: %s\n", description);
@@ -80,7 +85,7 @@ public class EntityParser {
 
                             GameCharacter characterObj = new GameCharacter(characterName, characterDescription);
                             loc.addCharacter(characterObj);
-                            System.out.printf("artefacts: %s\n", characterName);
+                            System.out.printf("character: %s\n", characterName);
                             System.out.printf("Description: %s\n", characterDescription);
                         }
                     }
@@ -94,13 +99,22 @@ public class EntityParser {
 
                 System.out.printf("Path: %s → %s\n", from, to);
 
-                Location fromLocation = world.getLocation(from); // Find this location based on its name
+                Location fromLocation = world.getLocation(from);
                 if (fromLocation != null) {
-                    fromLocation.addPath(to); // Add the path to this location
+                    fromLocation.addPath(to);
                 }
             }
             return world;
-        } catch (Exception e){
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + entitiesFile.getAbsolutePath());
+            e.printStackTrace();
+            return null;
+        } catch (ParseException e) {
+            System.err.println("Error parsing DOT file: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            System.err.println("Unexpected error while parsing entities: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

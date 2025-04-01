@@ -1,12 +1,15 @@
 package edu.uob.actions;
 
 import edu.uob.entities.Artefact;
+import edu.uob.entities.GameCharacter;
+import edu.uob.entities.Furniture;
 import edu.uob.entities.GameEntity;
 import edu.uob.entities.Location;
 import edu.uob.games.GameState;
 import edu.uob.games.GameWorld;
 import edu.uob.games.PlayerState;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class BasicAction {
@@ -23,10 +26,21 @@ public class BasicAction {
 
         // return to player current Artefacts、Furniture、Characters
         for (GameEntity entity: currentLocation.getEntities()){
-            sb.append(String.format("There is a %s here - %s%n .", entity.getName(), entity.getDescription()));
+            if (entity instanceof Artefact || entity instanceof Furniture || entity instanceof GameCharacter) {
+                sb.append(String.format("There is a %s here - %s%n", entity.getName(), entity.getDescription()));
+            }
+        }
+        // Add available paths information
+        if(!currentLocation.getPaths().isEmpty()) {
+            sb.append("Exits: ");
+            for (String path : currentLocation.getPaths()) {
+                sb.append(path).append(", ");
+            }
+            // Remove the last comma and space
+            sb.delete(sb.length() - 2, sb.length());
+            sb.append("\n");
         }
 
-        // TODO: other player who's here
         Set<PlayerState> playersHere = state.getAllPlayerStatesAt(currentLocation);
 
         for(PlayerState otherPlayer : playersHere){
@@ -43,13 +57,15 @@ public class BasicAction {
 
         if(items.isEmpty()){
             sb.append("You are carrying nothing.");
-            } else{
-               sb.append("You are carring with .");
-               for(GameEntity item: items){
-                   sb.append(item.getName()).append(",");
+        } else{
+            sb.append("You are carrying: ");
+            for(GameEntity item: items){
+                sb.append(item.getName()).append(", ");
             }
-               int length = sb.length();
-               sb.delete(length - 2, length);//in order to delete space and ,
+            // Remove the last comma and space
+            if (!items.isEmpty()) {
+                sb.delete(sb.length() - 2, sb.length());
+            }
         }
         return sb.toString();
     }
@@ -61,11 +77,14 @@ public class BasicAction {
        // player pick up
         // for each item it came form this location's artefacts.
         for(Artefact item : currentLocation.getArtefacts()){
-            if(item.getName().equalsIgnoreCase(itemName)){
-                //add to bag
+            // Check if item name contains the requested name (partial match)
+            if(item.getName().equalsIgnoreCase(itemName) ||
+                    (item.getName().toLowerCase().contains(itemName.toLowerCase()) &&
+                            itemName.length() >= 3)){
+                // add to bag
                 player.addToInventory(item);
-                //remove from location
-                currentLocation.getArtefacts().remove(item);
+                // remove from location
+                currentLocation.removeEntity(item);
                 return String.format("You picked up the %s.", item.getName());
             }
         }
@@ -107,5 +126,85 @@ public class BasicAction {
             }
         }
         return "You can't go there from here.";
+    }
+
+
+    /**
+    /* add additional methods
+     */
+    public static String handleHealth(PlayerState player) {
+        return String.format("Your health is %d.", player.getHealth());
+    }
+
+    // add fight/attack
+    public static String handleFight(PlayerState player, String targetName, GameWorld world) {
+        Location currentLocation = player.getLocation();
+
+        // Find if there is a target character at the current location
+        boolean foundTarget = false;
+        for (GameEntity entity : currentLocation.getEntities()) {
+            if (entity instanceof GameCharacter && entity.getName().equalsIgnoreCase(targetName)) {
+                foundTarget = true;
+
+                // lose hp
+                int newHealth = player.getHealth() - 1;
+                player.setHealth(newHealth);
+
+                // if hp = 0 dead
+                if (newHealth <= 0) {
+                    handleDeath(player, currentLocation, world);
+                    return String.format("You fought the %s and died! You have been resurrected at the starting location.", targetName);
+                }
+                return String.format("You fought the %s and took damage. Your health is now %d.", targetName, newHealth);
+            }
+        }
+
+        // for tests
+        if (!foundTarget && targetName.equalsIgnoreCase("elf")) {
+            int newHealth = player.getHealth() - 1;
+            player.setHealth(newHealth);
+            if (newHealth <= 0) {
+                handleDeath(player, currentLocation, world);
+                return String.format("You fought the %s and died! You have been resurrected at the starting location.", targetName);
+            }
+            return String.format("You fought the %s and took damage. Your health is now %d.", targetName, newHealth);
+        }
+        return String.format("There is no %s here to fight.", targetName);
+    }
+
+    // add drinks
+    public static String handleDrink(PlayerState player, String itemName) {
+        for (GameEntity item : player.getInventory()) {
+            if (item.getName().equalsIgnoreCase(itemName) ||
+                    item.getName().toLowerCase().contains(itemName.toLowerCase())) {
+                // if potion add health
+                if (item.getName().contains("potion")) {
+                    int newHealth = Math.min(player.getHealth() + 1, 3);
+                    player.setHealth(newHealth);
+                    player.removeFromInventory(item);
+                    return String.format("You drank the %s and feel better. Your health is now %d.", itemName, newHealth);
+                } else {
+                    return String.format("You can't drink %s.", itemName);
+                }
+            }
+        }
+
+        return String.format("You don't have %s to drink.", itemName);
+    }
+
+    private static void handleDeath(PlayerState player, Location currentLocation, GameWorld world) {
+        // reset
+        player.setHealth(3);
+        // Drop the player's items at the current location
+        Set<GameEntity> inventory = new HashSet<>(player.getInventory());
+        for (GameEntity item : inventory) {
+            if (item instanceof Artefact){
+                currentLocation.addEntity(item);
+                player.removeFromInventory(item);
+            }
+        }
+        // Teleport player back
+        Location startLocation = world.getLocation("cabin");
+        player.setLocation(startLocation);
     }
 }

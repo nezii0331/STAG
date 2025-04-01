@@ -40,9 +40,20 @@ public class GameWorld {
     //implement found their name in this world
     public GameEntity findEntityByName(String name){
         for(Location location: locations.values()){
+            if (location.getName().equals("storeroom")) {
+                continue;
+            }
             for(GameEntity entity: location.getEntities()){
                 if(entity.getName().equalsIgnoreCase(name)){
                     //if found it return this item to used
+                    return entity;
+                }
+            }
+        }
+        Location storeroom = getLocation("storeroom");
+        if (storeroom != null) {
+            for(GameEntity entity: storeroom.getEntities()){
+                if(entity.getName().equalsIgnoreCase(name)){
                     return entity;
                 }
             }

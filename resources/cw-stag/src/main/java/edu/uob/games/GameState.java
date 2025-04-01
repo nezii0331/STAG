@@ -23,7 +23,6 @@ public class GameState {
         return playerStates.get(playerName);
     }
 
-   // TODO: ADD MUTIPLAYER
    public Set<PlayerState> getAllPlayerStatesAt(Location location) {
        for (PlayerState player : playerStates.values()) {
            if (player.getLocation().equals(location)) {
@@ -33,4 +32,7 @@ public class GameState {
        return playersHere;
    }
 
+    public void addPlayer(PlayerState player) {
+        this.playerStates.put(player.getName(), player);
+    }
 }

@@ -15,6 +15,9 @@ public class PlayerState {
     // player with items
     private Set<GameEntity> inventory;
 
+    // initiate
+    private int health = 3;
+
     // create initial
     public PlayerState(String playerName, Location location) {
         this.playerName = playerName;
@@ -48,5 +51,15 @@ public class PlayerState {
     // removeFromInventory(GameEntity)
     public void removeFromInventory(GameEntity item) {
         this.inventory.remove(item);
+    }
+
+    //get health hp
+    public int getHealth() {
+        return this.health;
+    }
+
+    //set hp
+    public void setHealth(int health) {
+        this.health = health;
     }
 }

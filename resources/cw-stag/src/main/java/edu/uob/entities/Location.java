@@ -106,5 +106,36 @@ public class Location extends GameEntity{
         if(entity instanceof GameCharacter){
             characters.remove(entity);
         }
+        // checker
+        String entityName = entity.getName();
+
+        // check might in there?
+        for(Artefact art : new HashSet<>(artefacts)) {
+            if(art.getName().equalsIgnoreCase(entityName)) {
+                artefacts.remove(art);
+            }
+        }
+
+        for(Furniture furn : new HashSet<>(furniture)) {
+            if(furn.getName().equalsIgnoreCase(entityName)) {
+                furniture.remove(furn);
+            }
+        }
+
+        for(GameCharacter character : new HashSet<>(characters)) {
+            if(character.getName().equalsIgnoreCase(entityName)) {
+                characters.remove(character);
+            }
+        }
+    }
+
+    //helper
+    public boolean hasEntity(String name) {
+        for (GameEntity entity : getEntities()) {
+            if (entity.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

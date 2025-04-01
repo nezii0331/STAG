@@ -39,19 +39,14 @@ public class ActionParser {
 
                 // Process triggers
                 processTriggersForAction(actionElement, currentAction);
-
                 // Process subjects
                 processSubjectsForAction(actionElement, currentAction);
-
                 // Process consumed entities
                 processConsumedEntities(actionElement, currentAction);
-
                 // Process produced entities
                 processProducedEntities(actionElement, currentAction);
-
                 // Process narration
                 processNarration(actionElement, currentAction);
-
                 // Add action to the set
                 actions.add(currentAction);
             }

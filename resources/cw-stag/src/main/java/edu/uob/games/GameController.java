@@ -4,7 +4,8 @@ import edu.uob.actions.BasicAction;
 import edu.uob.actions.CustomActionExecutor;
 import edu.uob.entities.Location;
 
-//Add diversion: use BasicAction for built-in, otherwise leave it to CustomActionExecutor
+//Add diversion:
+// use BasicAction for built-in, otherwise leave it to CustomActionExecutor
 public class GameController {
 
     private final GameWorld world;
@@ -39,7 +40,10 @@ public class GameController {
         if(command.equals("inventory") || command.equals("inv")){
             return BasicAction.handleInventory(startState);
         }
-
+        // add hp
+        if(command.equals("health")){
+            return BasicAction.handleHealth(startState);
+        }
         if(command.startsWith("get ")){
             String item = command.substring(4).trim(); // get item name
             return BasicAction.handleGet(startState, item);
@@ -53,6 +57,23 @@ public class GameController {
         if(command.startsWith("goto ")){
             String destination = command.substring(5).trim();
             return BasicAction.handleGoto(world, startState, destination);
+        }
+
+        //drink
+        if(command.startsWith("drink ")){
+            String item = command.substring(6).trim();
+            return BasicAction.handleDrink(startState, item);
+        }
+
+        //add fight
+        if(command.startsWith("fight ") || command.startsWith("attack ")){
+            String target;
+            if(command.startsWith("fight ")){
+                target = command.substring(6).trim();
+            } else {
+                target = command.substring(7).trim();
+            }
+            return BasicAction.handleFight(startState, target, world);
         }
 
         // give what they want

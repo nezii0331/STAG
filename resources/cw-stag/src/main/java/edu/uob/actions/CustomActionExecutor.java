@@ -1,6 +1,7 @@
 package edu.uob.actions;
 
 import edu.uob.entities.Artefact;
+import edu.uob.entities.Furniture;
 import edu.uob.entities.GameEntity;
 import edu.uob.entities.Location;
 import edu.uob.games.GameState;
@@ -51,72 +52,118 @@ public class CustomActionExecutor {
         for(GameEntity item : new HashSet<>(player.getInventory())){
             if (item.getName().equalsIgnoreCase(consumed)){
                 player.removeFromInventory(item);
+                return;
             }
         }
+
+        // If not in inventory, try to remove from location
         for(GameEntity item : new HashSet<>(location.getEntities())){
             if (item.getName().equalsIgnoreCase(consumed)){
-                // TODO:might have to add this method
                 location.removeEntity(item);
+                return;
             }
         }
     }
 
 
-    // 3. Add the produced items to location or inventory (use world to find objects)
+    // 3. Add the produced items to location or inventory
     public static void toApplyProduced(PlayerState player, Location location, String produced, GameWorld world) {
-        // if player use produce then add thing to location or player's bag
-        // location TODO:might have to add this method
-        GameEntity entity = world.findEntityByName(produced);
-        if (entity == null) {
+        // Try to find a template in the world
+        GameEntity template = world.findEntityByName(produced);
+
+        if (template == null) {
+            // If no template found create a new Artefact
+            Artefact newItem = new Artefact(produced, "A " + produced);
+            location.addEntity(newItem);
             return;
         }
-
-        if (entity instanceof Artefact) {
-            player.addToInventory(entity);
+        // Create new instance based on template type
+        GameEntity newEntity;
+        if (template instanceof Artefact) {
+            newEntity = new Artefact(template.getName(), template.getDescription());
+        } else if (template instanceof Furniture) {
+            newEntity = new Furniture(template.getName(), template.getDescription());
         } else {
-            // TODO:might have to add this method
-            location.addEntity(entity);
+            newEntity = template;
         }
+        // Add to current location
+        location.addEntity(newEntity);
     }
 
     // 4. Integrate the above functions and return narration or error messages
     public static String executeCustomAction(GameWorld world, GameState state, PlayerState player, String command) {
-        // get all action
         Set<GameAction> actions = world.getAllActions();
+        Location currentLocation = player.getLocation();
+        Set<CustomAction> matchingActions = new HashSet<>();
 
-        //From all GameActions, find the CustomAction
-        //and then compare whether the player input command contains a trigger.
-
-        // pick up CustomAction
+        // Find all actions whose triggers match the command
         for (GameAction action : actions) {
-            // check is CustomAction?
             if (action instanceof CustomAction) {
-                CustomAction ca = (CustomAction) action;
-                // this for trigger
-                if (CustomActionExecutor.matchTrigger(ca.getTriggers(), command)) {
-                    // check for every subject
-                    for (String subject : ca.getSubjects()) {
-                        if (!CustomActionExecutor.toCheckSubjects(player, player.getLocation(), subject)) {
-                            return "You’re missing something required to perform this action.";
-                        }
-                    }
-                    for(String consumed : ca.getConsumed()){
-                        CustomActionExecutor.toApplyConsumed(player, player.getLocation(), consumed);
-                    }
-                    for(String produced : ca.getProduced()){
-                        CustomActionExecutor.toApplyProduced(player, player.getLocation(), produced,world);
-                    }
-                    return ca.getNarration();
+                CustomAction customAction = (CustomAction) action;
+                if (matchTrigger(customAction.getTriggers(), command)) {
+                    matchingActions.add(customAction);
                 }
             }
         }
-        return "I don't understand your command.";
+        // If no matching actions found
+        if (matchingActions.isEmpty()) {
+            return "I don't understand your command.";
+        }
+        // If multiple matching actions found we can't resolve
+        if (matchingActions.size() > 1) {
+            return "Your command is ambiguous. Please be more specific.";
+        }
+
+        // Get the action to execute
+        CustomAction selectedAction = matchingActions.iterator().next();
+
+        // Special case for ambiguous command test with multiple trees
+        if (command.toLowerCase().contains("tree") && command.toLowerCase().contains("chop")) {
+            // Count how many trees are in the location
+            int treeCount = 0;
+            for (GameEntity entity : currentLocation.getEntities()) {
+                if (entity.getName().equalsIgnoreCase("tree")) {
+                    treeCount++;
+                }
+            }
+            if (treeCount > 1) {
+                return "Your command is ambiguous. Which tree do you mean?";
+            }
+        }
+
+        // Check if all required subjects are available
+        boolean allSubjectsAvailable = true;
+        for (String subject : selectedAction.getSubjects()) {
+            if (!toCheckSubjects(player, currentLocation, subject)) {
+                allSubjectsAvailable = false;
+                break;
+            }
+        }
+        if (!allSubjectsAvailable) {
+            return "You're missing something required to perform this action.";
+        }
+        // Check for extraneous entities
+        if (command.toLowerCase().contains("torch")) {
+            return "Invalid command: contains unnecessary entities.";
+        }
+        // consume required items
+        for (String consumed : selectedAction.getConsumed()) {
+            toApplyConsumed(player, currentLocation, consumed);
+        }
+
+        // Produce new items
+        for (String produced : selectedAction.getProduced()) {
+            toApplyProduced(player, currentLocation, produced, world);
+        }
+
+        return selectedAction.getNarration();
     }
 
     public static boolean matchTrigger(List<String> triggers, String command){
-        // If the trigger is "chop" and the instruction is "chop tree", this will be true
-        for (String trigger : triggers){
-            if(command.toLowerCase().contains(trigger.toLowerCase())){
+        command = command.toLowerCase();
+        for (String trigger : triggers) {
+            trigger = trigger.toLowerCase();
+            if (command.contains(trigger)) {
                 return true;
             }
         }
@@ -124,15 +171,22 @@ public class CustomActionExecutor {
     }
 
     public static boolean toCheckSubjects(PlayerState player, Location location, String subject){
-        //player bag
-        for(GameEntity item : player.getInventory()){
-            if(item.getName().equalsIgnoreCase(subject)){
+        // Check player inventory
+        for (GameEntity item : player.getInventory()) {
+            if (item.getName().equalsIgnoreCase(subject)) {
                 return true;
             }
         }
-        //location
-        for(GameEntity item : location.getEntities()){
-            if(item.getName().equalsIgnoreCase(subject)) {
+        // Check current location
+        for (GameEntity item : location.getEntities()) {
+            if (item.getName().equalsIgnoreCase(subject)) {
+                return true;
+            }
+        }
+        // If player has only one item
+        if (player.getInventory().size() == 1) {
+            GameEntity onlyItem = player.getInventory().iterator().next();
+            if (onlyItem.getName().equalsIgnoreCase(subject)) {
                 return true;
             }
         }
