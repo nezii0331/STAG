@@ -44,21 +44,46 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
-        // create parser
-        EntityParser entityparser = new EntityParser();
-        ActionParser actionparser = new ActionParser();
+        try {
+            if (entitiesFile == null || actionsFile == null) {
+                throw new IllegalArgumentException("Entity or action file cannot be null");
+            }
 
-        // read entity file, add GameWorld
-        this.world = entityparser.parseEntities(entitiesFile);
-        // read action file
-        Set<CustomAction> actions = actionparser.parseAction(actionsFile);
-        // put every action file into GameWorld
-        for (GameAction action : actions) {
-            world.addAction(action);
+            if (!entitiesFile.exists()) {
+                throw new IllegalArgumentException("Entity file does not exist: " + entitiesFile.getAbsolutePath());
+            }
+
+            if (!actionsFile.exists()) {
+                throw new IllegalArgumentException("Action file does not exist: " + actionsFile.getAbsolutePath());
+            }
+
+            System.out.println("Reading entity file from: " + entitiesFile.getAbsolutePath());
+            System.out.println("Reading action file from: " + actionsFile.getAbsolutePath());
+
+            EntityParser entityparser = new EntityParser();
+            ActionParser actionparser = new ActionParser();
+
+            this.world = entityparser.parseEntities(entitiesFile);
+            if (this.world == null) {
+                throw new IllegalStateException("EntityParser returned null GameWorld!");
+            }
+
+            Set<CustomAction> actions = actionparser.parseAction(actionsFile);
+            for (GameAction action : actions) {
+                this.world.addAction(action);
+            }
+            this.state = new GameState();
+            this.controller = new GameController(world, state);
+            if (this.controller == null) {
+                throw new IllegalStateException("GameController is null!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error initializing GameServer: " + e.getMessage());
+            e.printStackTrace();
+            // Rethrow to prevent server from starting with invalid state
+            throw new RuntimeException("Failed to initialize GameServer", e);
         }
-        // create GameState
-        this.state = new GameState();
-        this.controller = new GameController(world, state);
     }
 
     /**

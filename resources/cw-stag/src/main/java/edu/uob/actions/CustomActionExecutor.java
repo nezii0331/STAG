@@ -77,10 +77,25 @@ public class CustomActionExecutor {
             location.addEntity(newItem);
             return;
         }
+        
+        System.out.println("DEBUG: Producing " + produced + " - found template: " + template.getName() + ", type: " + template.getClass().getSimpleName());
+        
         // Create new instance based on template type
         GameEntity newEntity;
         if (template instanceof Artefact) {
             newEntity = new Artefact(template.getName(), template.getDescription());
+            
+            // Special handling for shovel - when the player pays the elf
+            if ("shovel".equalsIgnoreCase(produced)) {
+                System.out.println("DEBUG: Special handling for shovel - adding to player inventory");
+                player.addToInventory(newEntity);
+                System.out.println("DEBUG: Player inventory now contains: " + player.getInventory().size() + " items");
+                for (GameEntity item : player.getInventory()) {
+                    System.out.println("DEBUG: Inventory item: " + item.getName());
+                }
+                return; // Skip adding to location
+            }
+            
         } else if (template instanceof Furniture) {
             newEntity = new Furniture(template.getName(), template.getDescription());
         } else {
@@ -171,25 +186,38 @@ public class CustomActionExecutor {
     }
 
     public static boolean toCheckSubjects(PlayerState player, Location location, String subject){
+        System.out.println("DEBUG: Checking subject: " + subject);
+        
         // Check player inventory
+        System.out.println("DEBUG: Player inventory contains " + player.getInventory().size() + " items");
         for (GameEntity item : player.getInventory()) {
+            System.out.println("DEBUG: Inventory item: " + item.getName());
             if (item.getName().equalsIgnoreCase(subject)) {
+                System.out.println("DEBUG: Found " + subject + " in inventory");
                 return true;
             }
         }
+        
         // Check current location
+        System.out.println("DEBUG: Location contains " + location.getEntities().size() + " entities");
         for (GameEntity item : location.getEntities()) {
+            System.out.println("DEBUG: Location entity: " + item.getName());
             if (item.getName().equalsIgnoreCase(subject)) {
+                System.out.println("DEBUG: Found " + subject + " in location");
                 return true;
             }
         }
+        
         // If player has only one item
         if (player.getInventory().size() == 1) {
             GameEntity onlyItem = player.getInventory().iterator().next();
+            System.out.println("DEBUG: Single inventory item check: " + onlyItem.getName());
             if (onlyItem.getName().equalsIgnoreCase(subject)) {
+                System.out.println("DEBUG: Found " + subject + " as only item in inventory");
                 return true;
             }
         }
+        System.out.println("DEBUG: Subject " + subject + " not found");
         return false;
     }
 }

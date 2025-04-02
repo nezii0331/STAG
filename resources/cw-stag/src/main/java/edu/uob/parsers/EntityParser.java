@@ -12,7 +12,6 @@ import edu.uob.entities.Location;
 import java.io.FileReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import com.alexmerz.graphviz.ParseException;
 
 /**
  * Parse .dot to create entities
@@ -28,11 +27,11 @@ public class EntityParser {
             GameWorld world = new GameWorld();
             // Build parser
             Parser parser = new Parser();
-            StringBuilder sb = new StringBuilder();
-
+            
             // Parse .dot files using JPGD API
             FileReader reader = new FileReader(entitiesFile);
             parser.parse(reader);
+            reader.close();
 
             // Get the root from files
             Graph root = parser.getGraphs().get(0);
@@ -107,10 +106,6 @@ public class EntityParser {
             return world;
         } catch (FileNotFoundException e) {
             System.err.println("File not found: " + entitiesFile.getAbsolutePath());
-            e.printStackTrace();
-            return null;
-        } catch (ParseException e) {
-            System.err.println("Error parsing DOT file: " + e.getMessage());
             e.printStackTrace();
             return null;
         } catch (Exception e) {

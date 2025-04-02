@@ -1,4 +1,0 @@
-# Created at 2025-04-01T18:14:05.392
-Boot Manifest-JAR contains absolute paths in classpath 'D:\user.data\Desktop\STAG\resources\cw-stag\target\test-classes'
-Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-

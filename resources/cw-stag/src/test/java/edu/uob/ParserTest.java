@@ -26,8 +26,8 @@ import edu.uob.games.GameWorld;
 import edu.uob.parsers.ActionParser;
 import edu.uob.parsers.EntityParser;
 import org.junit.jupiter.api.Disabled;
-
 @Disabled
+
 public class ParserTest {
 
     @TempDir
@@ -42,37 +42,37 @@ public class ParserTest {
         entitiesFile = tempDir.resolve("entities.dot").toFile();
         String entitiesContent = 
             "digraph game_graph {\n" +
-            "  # Locations\n" +
+            "  // Locations\n" +
             "  cabin [label=\"cabin\\nA cozy log cabin\"];\n" +
             "  forest [label=\"forest\\nA dense, dark forest\"];\n" +
             "  cave [label=\"cave\\nA mysterious cave\"];\n" +
             "  \n" +
-            "  # Paths\n" +
+            "  // Paths\n" +
             "  cabin -> forest;\n" +
             "  forest -> cabin;\n" +
             "  forest -> cave;\n" +
             "  cave -> forest;\n" +
             "  \n" +
-            "  # Artefacts\n" +
+            "  // Artefacts\n" +
             "  axe [label=\"axe\\nA sharp axe\", shape=polygon, sides=4];\n" +
             "  key [label=\"key\\nA rusty key\", shape=polygon, sides=4];\n" +
             "  \n" +
-            "  # Location of artefacts\n" +
+            "  // Location of artefacts\n" +
             "  cabin -> axe;\n" +
             "  forest -> key;\n" +
             "  \n" +
-            "  # Furniture\n" +
+            "  // Furniture\n" +
             "  tree [label=\"tree\\nA tall oak tree\", shape=polygon, sides=6];\n" +
             "  door [label=\"door\\nA wooden door\", shape=polygon, sides=6];\n" +
             "  \n" +
-            "  # Location of furniture\n" +
+            "  // Location of furniture\n" +
             "  forest -> tree;\n" +
             "  cave -> door;\n" +
             "  \n" +
-            "  # Characters\n" +
+            "  // Characters\n" +
             "  elf [label=\"elf\\nA forest elf\", shape=ellipse];\n" +
             "  \n" +
-            "  # Location of characters\n" +
+            "  // Location of characters\n" +
             "  forest -> elf;\n" +
             "}";
         Files.writeString(entitiesFile.toPath(), entitiesContent);
@@ -123,22 +123,22 @@ public class ParserTest {
     void testEntityParser() {
         EntityParser parser = new EntityParser();
         GameWorld gameWorld = parser.parseEntities(entitiesFile);
-        
+
         // Test locations
         assertNotNull(gameWorld.getLocation("cabin"));
         assertNotNull(gameWorld.getLocation("forest"));
         assertNotNull(gameWorld.getLocation("cave"));
-        
+
         // Test paths
         Location cabin = gameWorld.getLocation("cabin");
         Location forest = gameWorld.getLocation("forest");
         Location cave = gameWorld.getLocation("cave");
-        
+
         assertTrue(cabin.getPaths().contains("forest"));
         assertTrue(forest.getPaths().contains("cabin"));
         assertTrue(forest.getPaths().contains("cave"));
         assertTrue(cave.getPaths().contains("forest"));
-        
+
         // Test artefacts and their locations
         Set<Artefact> cabinArtefacts = cabin.getArtefacts();
         boolean hasAxe = false;
@@ -149,7 +149,7 @@ public class ParserTest {
             }
         }
         assertTrue(hasAxe, "Cabin should have an axe");
-        
+
         Set<Artefact> forestArtefacts = forest.getArtefacts();
         boolean hasKey = false;
         for (Artefact artefact : forestArtefacts) {
@@ -159,7 +159,7 @@ public class ParserTest {
             }
         }
         assertTrue(hasKey, "Forest should have a key");
-        
+
         // Test furniture and characters
         boolean hasTree = false;
         for (GameEntity entity : forest.getEntities()) {
@@ -169,7 +169,7 @@ public class ParserTest {
             }
         }
         assertTrue(hasTree, "Forest should have a tree");
-        
+
         boolean hasElf = false;
         for (GameEntity entity : forest.getEntities()) {
             if (entity.getName().equals("elf")) {
