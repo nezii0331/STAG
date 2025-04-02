@@ -68,4 +68,13 @@ final class EntitiesFileTests {
       assertTrue(cabin.getPaths().contains("forest"));
       assertEquals(2, cabin.getArtefacts().size());
   }
+
+    @Test
+    void testSimpleLook() {
+        File entitiesFile = new File("config/basic-entities.dot");
+        File actionsFile = new File("config/basic-actions.xml");
+        GameServer server = new GameServer(entitiesFile, actionsFile);
+        String response = server.handleCommand("simon: look");
+        assertTrue(response.toLowerCase().contains("cabin"));
+    }
 }
