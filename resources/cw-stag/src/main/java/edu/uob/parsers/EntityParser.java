@@ -92,11 +92,17 @@ public class EntityParser {
             }
             return world;
         } catch (FileNotFoundException e) {
-            System.err.println("File not found: " + entitiesFile.getAbsolutePath());
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("File not found: ");
+            errorMsg.append(entitiesFile.getAbsolutePath());
+            System.err.println(errorMsg.toString());
             e.printStackTrace();
             return null;
         } catch (Exception e) {
-            System.err.println("Unexpected error while parsing entities: " + e.getMessage());
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Unexpected error while parsing entities: ");
+            errorMsg.append(e.getMessage());
+            System.err.println(errorMsg.toString());
             e.printStackTrace();
             return null;
         }

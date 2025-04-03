@@ -24,7 +24,7 @@ public class BasicAction {
         sb.append(String.format("You are at %s now.%n", currentLocation.getName()));
         sb.append(String.format("%s%n", currentLocation.getDescription()));
 
-        // return to player current Artefacts、Furniture、Characters
+        // return to player current Artefacts?�Furniture?�Characters
         for (GameEntity entity: currentLocation.getEntities()){
             if (entity instanceof Artefact || entity instanceof Furniture || entity instanceof GameCharacter) {
                 sb.append(String.format("There is a %s here - %s%n", entity.getName(), entity.getDescription()));
@@ -152,7 +152,7 @@ public class BasicAction {
 
                 // if hp = 0 dead
                 if (newHealth <= 0) {
-                    handleDeath(player, currentLocation, world);
+                    BasicAction.handleDeath(player, currentLocation, world);
                     return String.format("You fought the %s and died! You have been resurrected at the starting location.", targetName);
                 }
                 return String.format("You fought the %s and took damage. Your health is now %d.", targetName, newHealth);
@@ -164,7 +164,7 @@ public class BasicAction {
             int newHealth = player.getHealth() - 1;
             player.setHealth(newHealth);
             if (newHealth <= 0) {
-                handleDeath(player, currentLocation, world);
+                BasicAction.handleDeath(player, currentLocation, world);
                 return String.format("You fought the %s and died! You have been resurrected at the starting location.", targetName);
             }
             return String.format("You fought the %s and took damage. Your health is now %d.", targetName, newHealth);

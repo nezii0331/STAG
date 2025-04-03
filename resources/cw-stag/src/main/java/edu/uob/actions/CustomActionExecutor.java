@@ -73,7 +73,10 @@ public class CustomActionExecutor {
 
         if (template == null) {
             // If no template found create a new Artefact
-            Artefact newItem = new Artefact(produced, "A " + produced);
+            StringBuilder description = new StringBuilder();
+            description.append("A ");
+            description.append(produced);
+            Artefact newItem = new Artefact(produced, description.toString());
             location.addEntity(newItem);
             return;
         }
@@ -157,12 +160,12 @@ public class CustomActionExecutor {
         }
         // consume required items
         for (String consumed : selectedAction.getConsumed()) {
-            toApplyConsumed(player, currentLocation, consumed);
+            CustomActionExecutor.toApplyConsumed(player, currentLocation, consumed);
         }
 
         // Produce new items
         for (String produced : selectedAction.getProduced()) {
-            toApplyProduced(player, currentLocation, produced, world);
+            CustomActionExecutor.toApplyProduced(player, currentLocation, produced, world);
         }
 
         return selectedAction.getNarration();

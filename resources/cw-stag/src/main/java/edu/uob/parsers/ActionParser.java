@@ -35,22 +35,25 @@ public class ActionParser {
                 CustomAction currentAction = new CustomAction();
 
                 // Process triggers
-                processTriggersForAction(actionElement, currentAction);
+                this.processTriggersForAction(actionElement, currentAction);
                 // Process subjects
-                processSubjectsForAction(actionElement, currentAction);
+                this.processSubjectsForAction(actionElement, currentAction);
                 // Process consumed entities
-                processConsumedEntities(actionElement, currentAction);
+                this.processConsumedEntities(actionElement, currentAction);
                 // Process produced entities
-                processProducedEntities(actionElement, currentAction);
+                this.processProducedEntities(actionElement, currentAction);
                 // Process narration
-                processNarration(actionElement, currentAction);
+                this.processNarration(actionElement, currentAction);
                 // Add action to the set
                 actions.add(currentAction);
             }
 
         } catch (Exception e) {
             // Log any parsing errors
-            System.err.println("Error parsing action file: " + e.getMessage());
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Error parsing action file: ");
+            errorMsg.append(e.getMessage());
+            System.err.println(errorMsg.toString());
             e.printStackTrace();
         }
 

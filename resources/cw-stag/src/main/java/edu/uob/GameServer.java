@@ -48,10 +48,16 @@ public final class GameServer {
                 throw new IllegalArgumentException("Entity or action file cannot be null");
             }
             if (!entitiesFile.exists()) {
-                throw new IllegalArgumentException("Entity file does not exist: " + entitiesFile.getAbsolutePath());
+                StringBuilder errorMsg = new StringBuilder();
+                errorMsg.append("Entity file does not exist: ");
+                errorMsg.append(entitiesFile.getAbsolutePath());
+                throw new IllegalArgumentException(errorMsg.toString());
             }
             if (!actionsFile.exists()) {
-                throw new IllegalArgumentException("Action file does not exist: " + actionsFile.getAbsolutePath());
+                StringBuilder errorMsg = new StringBuilder();
+                errorMsg.append("Action file does not exist: ");
+                errorMsg.append(actionsFile.getAbsolutePath());
+                throw new IllegalArgumentException(errorMsg.toString());
             }
             EntityParser entityparser = new EntityParser();
             ActionParser actionparser = new ActionParser();
@@ -71,7 +77,10 @@ public final class GameServer {
             }
 
         } catch (Exception e) {
-            System.err.println("Error initializing GameServer: " + e.getMessage());
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Error initializing GameServer: ");
+            errorMsg.append(e.getMessage());
+            System.err.println(errorMsg.toString());
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize GameServer", e);
             // Rethrow to prevent server from starting with invalid state

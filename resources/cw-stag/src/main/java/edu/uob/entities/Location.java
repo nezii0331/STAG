@@ -131,7 +131,7 @@ public class Location extends GameEntity{
 
     //helper
     public boolean hasEntity(String name) {
-        for (GameEntity entity : getEntities()) {
+        for (GameEntity entity : this.getEntities()) {
             if (entity.getName().equalsIgnoreCase(name)) {
                 return true;
             }

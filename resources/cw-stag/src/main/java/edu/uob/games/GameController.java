@@ -18,15 +18,17 @@ public class GameController {
 
     public String handleCommand(String input){
         // 1. parser input → playerName, command
-        String[] parts = input.split(":");// 用冒號切開
-
-        // check long
-        if(parts.length < 2){
+        String playerName;
+        String command;
+        
+        int colonIndex = input.indexOf(':');
+        if (colonIndex == -1) {
             return "Your command is invalid, please use like [player : command].";
         }
-        // take space and
-        String playerName = parts[0].trim().toLowerCase();
-        String command = parts[1].trim().toLowerCase();
+        
+        // Extract playerName and command
+        playerName = input.substring(0, colonIndex).trim().toLowerCase();
+        command = input.substring(colonIndex + 1).trim().toLowerCase();
 
         // 2. create start PlayerState
         Location startLocation = world.getLocation("cabin");

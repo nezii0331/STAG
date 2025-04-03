@@ -50,7 +50,7 @@ public class GameWorld {
                 }
             }
         }
-        Location storeroom = getLocation("storeroom");
+        Location storeroom = this.getLocation("storeroom");
         if (storeroom != null) {
             for(GameEntity entity: storeroom.getEntities()){
                 if(entity.getName().equalsIgnoreCase(name)){
