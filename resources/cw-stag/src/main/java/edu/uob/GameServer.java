@@ -24,13 +24,12 @@ public final class GameServer {
     private static final char END_OF_TRANSMISSION = 4;
 
     public static void main(String[] args) throws IOException {
-        File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
+        File entitiesFile = Paths.get("resources" + File.separator + "cw-stag" + File.separator + "config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
+        File actionsFile = Paths.get("resources" + File.separator + "cw-stag" + File.separator + "config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }
 
-    //====check====
     private GameWorld world;
     private GameState state;
     private GameController controller;
@@ -48,11 +47,9 @@ public final class GameServer {
             if (entitiesFile == null || actionsFile == null) {
                 throw new IllegalArgumentException("Entity or action file cannot be null");
             }
-
             if (!entitiesFile.exists()) {
                 throw new IllegalArgumentException("Entity file does not exist: " + entitiesFile.getAbsolutePath());
             }
-
             if (!actionsFile.exists()) {
                 throw new IllegalArgumentException("Action file does not exist: " + actionsFile.getAbsolutePath());
             }
@@ -81,8 +78,8 @@ public final class GameServer {
         } catch (Exception e) {
             System.err.println("Error initializing GameServer: " + e.getMessage());
             e.printStackTrace();
-            // Rethrow to prevent server from starting with invalid state
             throw new RuntimeException("Failed to initialize GameServer", e);
+            // Rethrow to prevent server from starting with invalid state
         }
     }
 
