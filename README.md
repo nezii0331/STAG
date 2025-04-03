@@ -142,6 +142,6 @@ Defined in `basic-actions.xml` using:
 
 ## 📌 Author
 
-Created by **negi**  
+Created by **Negi Chen**  
 University of Bristol – COMS Coursework  
 Spring 2025
