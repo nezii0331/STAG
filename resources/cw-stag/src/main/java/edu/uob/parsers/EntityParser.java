@@ -20,7 +20,6 @@ public class EntityParser {
     public GameWorld parseEntities(File entitiesFile){
         try {
             if (!entitiesFile.exists()) {
-                System.err.println("File not found: " + entitiesFile.getAbsolutePath());
                 return null;
             }
 
@@ -45,6 +44,7 @@ public class EntityParser {
 
                 Location loc = new Location(name, description);
                 world.addLocation(loc);
+
                 for (Graph subgraph : location.getSubgraphs()){
                     if (subgraph.getId().getId().equals("artefacts")){
                         for(Node artefact : subgraph.getNodes(false)){

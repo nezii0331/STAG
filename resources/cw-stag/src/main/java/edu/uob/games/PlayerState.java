@@ -43,12 +43,12 @@ public class PlayerState {
         return this.inventory;
     }
 
-    // addToInventory
+    // addToInventory(GameEntity)
     public void addToInventory(GameEntity item) {
         this.inventory.add(item);
     }
 
-    // removeFromInventory
+    // removeFromInventory(GameEntity)
     public void removeFromInventory(GameEntity item) {
         this.inventory.remove(item);
     }
