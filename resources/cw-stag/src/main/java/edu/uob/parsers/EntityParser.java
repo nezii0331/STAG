@@ -45,10 +45,6 @@ public class EntityParser {
 
                 Location loc = new Location(name, description);
                 world.addLocation(loc);
-
-                System.out.printf("Location: %s\n", name);
-                System.out.printf("Description: %s\n", description);
-
                 for (Graph subgraph : location.getSubgraphs()){
                     if (subgraph.getId().getId().equals("artefacts")){
                         for(Node artefact : subgraph.getNodes(false)){
@@ -57,8 +53,6 @@ public class EntityParser {
 
                             Artefact artefacts = new Artefact(artefactName, artefactDescription);
                             loc.addArtefact(artefacts);
-                            System.out.printf("artefacts: %s\n", artefactName);
-                            System.out.printf("Description: %s\n", artefactDescription);
                         }
                     }
                 }
@@ -71,8 +65,6 @@ public class EntityParser {
 
                             Furniture furnObj = new Furniture(furnitureName, furnitureDescription);
                             loc.addFurniture(furnObj);
-                            System.out.printf("furniture: %s\n", furnitureName);
-                            System.out.printf("Description: %s\n", furnitureDescription);
                         }
                     }
                 }
@@ -84,8 +76,6 @@ public class EntityParser {
 
                             GameCharacter characterObj = new GameCharacter(characterName, characterDescription);
                             loc.addCharacter(characterObj);
-                            System.out.printf("character: %s\n", characterName);
-                            System.out.printf("Description: %s\n", characterDescription);
                         }
                     }
                 }
@@ -95,9 +85,6 @@ public class EntityParser {
             for (Edge edge : pathSection.getEdges()) {
                 String from = edge.getSource().getNode().getId().getId();
                 String to = edge.getTarget().getNode().getId().getId();
-
-                System.out.printf("Path: %s → %s\n", from, to);
-
                 Location fromLocation = world.getLocation(from);
                 if (fromLocation != null) {
                     fromLocation.addPath(to);

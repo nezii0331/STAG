@@ -53,13 +53,8 @@ public final class GameServer {
             if (!actionsFile.exists()) {
                 throw new IllegalArgumentException("Action file does not exist: " + actionsFile.getAbsolutePath());
             }
-
-            System.out.println("Reading entity file from: " + entitiesFile.getAbsolutePath());
-            System.out.println("Reading action file from: " + actionsFile.getAbsolutePath());
-
             EntityParser entityparser = new EntityParser();
             ActionParser actionparser = new ActionParser();
-
             this.world = entityparser.parseEntities(entitiesFile);
             if (this.world == null) {
                 throw new IllegalStateException("EntityParser returned null GameWorld!");

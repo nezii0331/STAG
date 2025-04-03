@@ -69,25 +69,19 @@ public class CustomActionExecutorTest {
         String narration = "You chopped down the tree with the axe and got a log!";
 
         chopAction = new CustomAction();
-        // 添加触发词
         for (String trigger : triggers) {
             chopAction.addTriggers(trigger);
         }
-        // 添加主体
         for (String subject : subjects) {
             chopAction.addSubjects(subject);
         }
-        // 添加消耗物品
         for (String item : consumed) {
             chopAction.addConsumed(item);
         }
-        // 添加产生物品
         for (String item : produced) {
             chopAction.addProduced(item);
         }
-        // 添加叙述
         chopAction.addNarration(narration);
-
         gameWorld.addAction(chopAction);
     }
 
@@ -140,13 +134,10 @@ public class CustomActionExecutorTest {
         // Player moves to forest
         player.setLocation(forest);
 
-        // Try with "cut" instead of "chop"
         List<String> command = new LinkedList<>(Arrays.asList("cut", "tree", "with", "axe"));
 
         String result = CustomActionExecutor.executeCustomAction(gameWorld, gameState, player, String.join(" ", command));
         assertTrue(result.toLowerCase().contains("chopped") || result.equals(chopAction.getNarration()));
-
-        // Tree should be consumed
         assertFalse(forest.hasEntity("tree"));
 
         // Log should be produced
@@ -188,7 +179,7 @@ public class CustomActionExecutorTest {
         // Player moves to forest
         player.setLocation(forest);
 
-        // Partial command (only specifying tree, not axe)
+        // Partial command
         List<String> command = new LinkedList<>(Arrays.asList("chop", "tree"));
 
         String result = CustomActionExecutor.executeCustomAction(gameWorld, gameState, player, String.join(" ", command));
@@ -212,8 +203,6 @@ public class CustomActionExecutorTest {
         // Player picks up the axe
         player.addToInventory(axe);
         cabin.removeEntity(axe);
-
-        // Player moves to forest
         player.setLocation(forest);
 
         // Command with extra entities not needed for the action
@@ -222,7 +211,6 @@ public class CustomActionExecutorTest {
         String result = CustomActionExecutor.executeCustomAction(gameWorld, gameState, player, String.join(" ", command));
         assertFalse(result.toLowerCase().contains("chopped"));
         assertTrue(result.toLowerCase().contains("cannot") || result.toLowerCase().contains("invalid"));
-
         // Tree should still exist
         assertTrue(forest.hasEntity("tree"));
         assertFalse(forest.hasEntity("log"));
@@ -243,7 +231,7 @@ public class CustomActionExecutorTest {
         // Player moves to forest
         player.setLocation(forest);
 
-        // Ambiguous command (which tree?)
+        // which tree?
         List<String> command = new LinkedList<>(Arrays.asList("chop", "tree", "with", "axe"));
 
         String result = CustomActionExecutor.executeCustomAction(gameWorld, gameState, player, String.join(" ", command));

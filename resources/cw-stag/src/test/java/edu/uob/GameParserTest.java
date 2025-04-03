@@ -185,7 +185,6 @@ public class GameParserTest {
     public void testEntityParsing_InvalidFile() {
         File invalidFile = new File("non_existent_file.dot");
         GameWorld invalidWorld = entityParser.parseEntities(invalidFile);
-
         assertNull(invalidWorld, "GameWorld should be null for invalid file");
     }
 
@@ -193,7 +192,6 @@ public class GameParserTest {
     public void testActionParsing_InvalidFile() {
         File invalidFile = new File("non_existent_file.xml");
         Set<CustomAction> invalidActions = actionParser.parseAction(invalidFile);
-
         assertNotNull(invalidActions, "Actions set should not be null");
         assertTrue(invalidActions.isEmpty(), "Actions set should be empty for invalid file");
     }

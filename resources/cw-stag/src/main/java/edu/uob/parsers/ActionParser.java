@@ -10,7 +10,7 @@ import java.util.Set;
 public class ActionParser {
     /**
      * Parse XML file to extract action details
-     * @param actionFile XML file containing action definitions
+     * XML file containing action definitions
      * @return Set of CustomAction objects parsed from the XML
      */
     public Set<CustomAction> parseAction(File actionFile) {
@@ -21,27 +21,18 @@ public class ActionParser {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
-
             // Parse XML file
             Document doc = db.parse(actionFile);
             doc.getDocumentElement().normalize();
-
-            // Get all <action> tags
+            // Get all tags
             NodeList actionNodes = doc.getElementsByTagName("action");
-
-            // Log total number of actions
-            System.out.printf("Total %d actions:%n", actionNodes.getLength());
-
             // Iterate through each action
             for (int i = 0; i < actionNodes.getLength(); i++) {
                 Element actionElement = (Element) actionNodes.item(i);
                 CustomAction currentAction = new CustomAction();
-
-                // Process triggers
                 processTriggersForAction(actionElement, currentAction);
-                // Process subjects
                 processSubjectsForAction(actionElement, currentAction);
-                // Process consumed entities
+
                 processConsumedEntities(actionElement, currentAction);
                 // Process produced entities
                 processProducedEntities(actionElement, currentAction);
@@ -62,7 +53,6 @@ public class ActionParser {
 
     /**
      * Process trigger keywords for an action
-     * @param actionElement XML element representing the action
      * @param action CustomAction to add triggers to
      */
     private void processTriggersForAction(Element actionElement, CustomAction action) {
@@ -73,19 +63,14 @@ public class ActionParser {
 
             for (int j = 0; j < keywords.getLength(); j++) {
                 String keyword = keywords.item(j).getTextContent().trim();
-                System.out.printf("Trigger: %s%n", keyword);
                 // Assuming addKeyword method exists in CustomAction
-//===check==    CustomAction actions = new CustomAction();
                 action.addTriggers(keyword);
-                //===check==
-                System.out.printf("keyword: %s\n", keyword);
             }
         }
     }
 
     /**
      * Process subject entities for an action
-     * @param actionElement XML element representing the action
      * @param action CustomAction to add subjects to
      */
     private void processSubjectsForAction(Element actionElement, CustomAction action) {
@@ -96,7 +81,6 @@ public class ActionParser {
 
             for (int j = 0; j < keywords.getLength(); j++) {
                 String keyword = keywords.item(j).getTextContent().trim();
-                System.out.printf("Subject: %s%n", keyword);
                 // Add method to store subjects in CustomAction if needed
                 action.addSubjects(keyword);
             }
@@ -106,7 +90,7 @@ public class ActionParser {
     /**
      * Process consumed entities for an action
      * @param actionElement XML element representing the action
-     * @param action CustomAction to add consumed entities to
+     *  CustomAction to add consumed entities to
      */
     private void processConsumedEntities(Element actionElement, CustomAction action) {
         NodeList consumed = actionElement.getElementsByTagName("consumed");
@@ -116,7 +100,6 @@ public class ActionParser {
 
             for (int j = 0; j < keywords.getLength(); j++) {
                 String keyword = keywords.item(j).getTextContent().trim();
-                System.out.printf("Consumed: %s%n", keyword);
                 // Add method to store consumed entities in CustomAction if needed
                 action.addConsumed(keyword);
             }
@@ -125,7 +108,6 @@ public class ActionParser {
 
     /**
      * Process produced entities for an action
-     * @param actionElement XML element representing the action
      * @param action CustomAction to add produced entities to
      */
     private void processProducedEntities(Element actionElement, CustomAction action) {
@@ -136,7 +118,6 @@ public class ActionParser {
 
             for (int j = 0; j < keywords.getLength(); j++) {
                 String keyword = keywords.item(j).getTextContent().trim();
-                System.out.printf("Produced: %s%n", keyword);
                 // Add method to store produced entities in CustomAction if needed
                 action.addProduced(keyword);
             }
@@ -145,14 +126,12 @@ public class ActionParser {
 
     /**
      * Process narration for an action
-     * @param actionElement XML element representing the action
      * @param action CustomAction to add narration to
      */
     private void processNarration(Element actionElement, CustomAction action) {
         NodeList narrations = actionElement.getElementsByTagName("narration");
         if (narrations.getLength() > 0) {
             String narrationWord = narrations.item(0).getTextContent().trim();
-            System.out.printf("Narration: %s%n", narrationWord);
             // Add method to store narration in CustomAction if needed
             action.addNarration(narrationWord);
         }

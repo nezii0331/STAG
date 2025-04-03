@@ -56,10 +56,8 @@ public class GameEngineTest {
         forest.addArtefact(key);
         storeroom.addArtefact(log);
 
-        // Add characters to locations
         cellar.addEntity(elf);
 
-        // Add entities to locations
         Furniture tree = new Furniture("tree", "A tall oak tree");
         forest.addEntity(tree);
 
@@ -140,7 +138,6 @@ public class GameEngineTest {
         String result = gameController.handleCommand("player: drop axe");
         assertEquals("You dropped the axe.", result);
 
-        // Try to drop an item that's not in inventory
         result = gameController.handleCommand("player: drop axe");
         assertEquals("You don't have that item to drop.", result);
     }
@@ -151,15 +148,12 @@ public class GameEngineTest {
         String result = gameController.handleCommand("player: goto forest");
         assertEquals("You moved to forest.", result);
 
-        // Check current location with look
         result = gameController.handleCommand("player: look");
         assertTrue(result.contains("You are at forest now."));
 
-        // Try to go to a non-connected location
         result = gameController.handleCommand("player: goto cave");
         assertEquals("You moved to cave.", result);
 
-        // Try to go to a non-existent location
         result = gameController.handleCommand("player: goto mountain");
         assertEquals("You can't go there from here.", result);
     }
@@ -213,8 +207,6 @@ public class GameEngineTest {
         // Go to the forest
         gameController.handleCommand("player: goto forest");
         System.out.println("Debug: Player moved to forest");
-
-        // 检查树是否在森林中
         String lookBeforeChop = gameController.handleCommand("player: look");
         System.out.println("Debug - Before chopping, look result: " + lookBeforeChop);
         assertTrue(lookBeforeChop.contains("tree"), "Tree should be in the forest before chopping");
@@ -223,8 +215,6 @@ public class GameEngineTest {
         String result = gameController.handleCommand("player: chop tree with axe");
         System.out.println("Debug - Chop command result: " + result);
         assertEquals("You chopped down the tree with your axe!", result);
-
-        // 等待一下，确保所有操作已完成
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -234,8 +224,6 @@ public class GameEngineTest {
         // Check that tree is gone and log is produced
         String lookResult = gameController.handleCommand("player: look");
         System.out.println("Debug - After chopping, look result: " + lookResult);
-
-        // 更详细的断言
         assertFalse(lookResult.contains("There is a tree here"), "Tree should be gone after chopping");
         assertTrue(lookResult.contains("log") || lookResult.contains("There is a log here"),
                 "Log should be produced after chopping tree. Look result: " + lookResult);
