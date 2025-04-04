@@ -24,8 +24,26 @@ public final class GameServer {
     private static final char END_OF_TRANSMISSION = 4;
 
     public static void main(String[] args) throws IOException {
-        File entitiesFile = Paths.get("resources" + File.separator + "cw-stag" + File.separator + "config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("resources" + File.separator + "cw-stag" + File.separator + "config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
+        StringBuilder entitiesPathBuilder = new StringBuilder();
+        entitiesPathBuilder.append("resources");
+        entitiesPathBuilder.append(File.separator);
+        entitiesPathBuilder.append("cw-stag");
+        entitiesPathBuilder.append(File.separator);
+        entitiesPathBuilder.append("config");
+        entitiesPathBuilder.append(File.separator);
+        entitiesPathBuilder.append("basic-entities.dot");
+        File entitiesFile = Paths.get(entitiesPathBuilder.toString()).toAbsolutePath().toFile();
+        
+        StringBuilder actionsPathBuilder = new StringBuilder();
+        actionsPathBuilder.append("resources");
+        actionsPathBuilder.append(File.separator);
+        actionsPathBuilder.append("cw-stag");
+        actionsPathBuilder.append(File.separator);
+        actionsPathBuilder.append("config");
+        actionsPathBuilder.append(File.separator);
+        actionsPathBuilder.append("basic-actions.xml");
+        File actionsFile = Paths.get(actionsPathBuilder.toString()).toAbsolutePath().toFile();
+        
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }
@@ -107,10 +125,13 @@ public final class GameServer {
     */
     public void blockingListenOn(int portNumber) throws IOException {
         try (ServerSocket s = new ServerSocket(portNumber)) {
-            System.out.println("Server listening on port " + portNumber);
+            StringBuilder portMsg = new StringBuilder();
+            portMsg.append("Server listening on port ");
+            portMsg.append(portNumber);
+            System.out.println(portMsg.toString());
             while (!Thread.interrupted()) {
                 try {
-                    blockingHandleConnection(s);
+                    this.blockingHandleConnection(s);
                 } catch (IOException e) {
                     System.out.println("Connection closed");
                 }
@@ -132,10 +153,17 @@ public final class GameServer {
             System.out.println("Connection established");
             String incomingCommand = reader.readLine();
             if(incomingCommand != null) {
-                System.out.println("Received message from " + incomingCommand);
-                String result = handleCommand(incomingCommand);
+                StringBuilder msgBuilder = new StringBuilder();
+                msgBuilder.append("Received message from ");
+                msgBuilder.append(incomingCommand);
+                System.out.println(msgBuilder.toString());
+                String result = this.handleCommand(incomingCommand);
                 writer.write(result);
-                writer.write("\n" + END_OF_TRANSMISSION + "\n");
+                StringBuilder endBuilder = new StringBuilder();
+                endBuilder.append("\n");
+                endBuilder.append(END_OF_TRANSMISSION);
+                endBuilder.append("\n");
+                writer.write(endBuilder.toString());
                 writer.flush();
             }
         }

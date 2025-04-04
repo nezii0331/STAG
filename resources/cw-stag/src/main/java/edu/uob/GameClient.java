@@ -18,23 +18,36 @@ public final class GameClient {
 
     public static void main(String[] args) throws IOException {
         String username = args[0];
-        while (!Thread.interrupted()) handleNextCommand(username);
+        while (!Thread.interrupted()) GameClient.handleNextCommand(username);
     }
 
     private static void handleNextCommand(String username) throws IOException {
-        System.out.print(username + ":> ");
+        StringBuilder promptBuilder = new StringBuilder();
+        promptBuilder.append(username);
+        promptBuilder.append(":> ");
+        System.out.print(promptBuilder.toString());
         BufferedReader commandLine = new BufferedReader(new InputStreamReader(System.in));
         String command = commandLine.readLine();
         try (var socket = new Socket("localhost", 8888);
         var socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         var socketWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
-            socketWriter.write(username + ": " + command + "\n");
+            StringBuilder commandBuilder = new StringBuilder();
+            commandBuilder.append(username);
+            commandBuilder.append(": ");
+            commandBuilder.append(command);
+            commandBuilder.append("\n");
+            socketWriter.write(commandBuilder.toString());
             socketWriter.flush();
             String incomingMessage = socketReader.readLine();
             if (incomingMessage == null) {
                 throw new IOException("Server disconnected (end-of-stream)");
             }
-            while (incomingMessage != null && !incomingMessage.contains("" + END_OF_TRANSMISSION + "")) {
+            StringBuilder eotBuilder = new StringBuilder();
+            eotBuilder.append("");
+            eotBuilder.append(END_OF_TRANSMISSION);
+            eotBuilder.append("");
+            String eotString = eotBuilder.toString();
+            while (incomingMessage != null && !incomingMessage.contains(eotString)) {
                 System.out.println(incomingMessage);
                 incomingMessage = socketReader.readLine();
             }
