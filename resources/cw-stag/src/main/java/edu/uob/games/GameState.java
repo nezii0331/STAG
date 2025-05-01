@@ -9,14 +9,13 @@ import edu.uob.entities.Location;
 
 public class GameState {
     private Map<String, PlayerState> playerStates;
-    private Set<PlayerState> playersHere = new HashSet<>();
 
     public GameState() {
         this.playerStates = new LinkedHashMap<>();
     }
 
 
-    public PlayerState currentStates(String playerName, Location startLocation){
+    public PlayerState getOrCreatePlayerState(String playerName, Location startLocation){
         if(!playerStates.containsKey(playerName)){
             playerStates.put(playerName, new PlayerState(playerName, startLocation));
         }
@@ -24,6 +23,7 @@ public class GameState {
     }
 
    public Set<PlayerState> getAllPlayerStatesAt(Location location) {
+       Set<PlayerState> playersHere = new HashSet<>();
        for (PlayerState player : playerStates.values()) {
            if (player.getLocation().equals(location)) {
                playersHere.add(player);

@@ -29,6 +29,14 @@ public class GameWorld {
         return this.locations.get(name);
     }
 
+    /**
+     * Returns all locations in the game world
+     * @return Set of all Location objects
+     */
+    public Set<Location> getLocations(){
+        return new HashSet<>(this.locations.values());
+    }
+
     public void addAction(GameAction action){
         this.actions.add(action);
     }

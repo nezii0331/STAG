@@ -29,10 +29,18 @@ public class GameController {
         // Extract playerName and command
         playerName = input.substring(0, colonIndex).trim().toLowerCase();
         command = input.substring(colonIndex + 1).trim().toLowerCase();
-
+        
+        // Validate player name using regular expression (only allow alphanumeric characters)
+        if (!playerName.matches("^[a-zA-Z0-9]+$")) {
+            return "Invalid player name. Player name must contain only letters and numbers.";
+        }
+        
+        // Normalize command (remove extra spaces, standardize format)
+        command = normalizeCommand(command);
+        
         // 2. create start PlayerState
         Location startLocation = world.getLocation("cabin");
-        PlayerState startState = state.currentStates(playerName, startLocation);
+        PlayerState startState = state.getOrCreatePlayerState(playerName, startLocation);
 
         // 3. handle basic command
         if(command.equals("look")){
@@ -80,5 +88,23 @@ public class GameController {
 
         // give what they want
         return CustomActionExecutor.executeCustomAction(world, state, startState, command);
+    }
+
+    /**
+     * Normalize the command by removing extra spaces and standardizing format
+     */
+    private String normalizeCommand(String command) {
+        // Remove extra spaces
+        command = command.replaceAll("\\s+", " ").trim();
+        
+        // Handle common command variations
+        if (command.matches("(?i)inv.*")) {
+            return "inventory";
+        }
+        if (command.matches("(?i)health.*") || command.matches("(?i)hp.*")) {
+            return "health";
+        }
+        
+        return command;
     }
 }

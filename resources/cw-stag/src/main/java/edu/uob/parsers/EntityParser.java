@@ -17,95 +17,150 @@ import java.io.FileNotFoundException;
  * Parse .dot to create entities
  */
 public class EntityParser {
-    public GameWorld parseEntities(File entitiesFile){
+    /**
+     * Parse entities from a DOT file and create a game world
+     */
+    public GameWorld parseEntities(File entitiesFile) {
         try {
             if (!entitiesFile.exists()) {
                 return null;
             }
 
-            GameWorld world = new GameWorld();
-            // Build parser
-            Parser parser = new Parser();
+            GameWorld gameWorld = new GameWorld();
+            Graph rootGraph = parseGraphFromFile(entitiesFile);
+            if (rootGraph == null) {
+                return null;
+            }
+
+            // Process locations
+            processLocations(rootGraph, gameWorld);
             
-            // Parse .dot files using JPGD API
-            FileReader reader = new FileReader(entitiesFile);
-            parser.parse(reader);
-            reader.close();
-
-            // Get the root from files
-            Graph root = parser.getGraphs().get(0);
-
-            //get subgraph
-            Graph locationSection = root.getSubgraphs().get(0);
-            for (Graph location : locationSection.getSubgraphs()) {
-                Node locationNode = location.getNodes(false).get(0);
-                String name = locationNode.getId().getId();
-                String description = locationNode.getAttribute("description");
-
-                Location loc = new Location(name, description);
-                world.addLocation(loc);
-
-                for (Graph subgraph : location.getSubgraphs()){
-                    if (subgraph.getId().getId().equals("artefacts")){
-                        for(Node artefact : subgraph.getNodes(false)){
-                            String artefactName = artefact.getId().getId();
-                            String artefactDescription = artefact.getAttribute("description");
-
-                            Artefact artefacts = new Artefact(artefactName, artefactDescription);
-                            loc.addArtefact(artefacts);
-                        }
-                    }
-                }
-
-                for (Graph subgraph : location.getSubgraphs()){
-                    if (subgraph.getId().getId().equals("furniture")){
-                        for(Node furniture : subgraph.getNodes(false)){
-                            String furnitureName = furniture.getId().getId();
-                            String furnitureDescription = furniture.getAttribute("description");
-
-                            Furniture furnObj = new Furniture(furnitureName, furnitureDescription);
-                            loc.addFurniture(furnObj);
-                        }
-                    }
-                }
-                for (Graph subgraph : location.getSubgraphs()){
-                    if (subgraph.getId().getId().equals("characters")){
-                        for(Node character : subgraph.getNodes(false)){
-                            String characterName = character.getId().getId();
-                            String characterDescription = character.getAttribute("description");
-
-                            GameCharacter characterObj = new GameCharacter(characterName, characterDescription);
-                            loc.addCharacter(characterObj);
-                        }
-                    }
-                }
-            }
-            Graph pathSection = root.getSubgraphs().get(1);
-
-            for (Edge edge : pathSection.getEdges()) {
-                String from = edge.getSource().getNode().getId().getId();
-                String to = edge.getTarget().getNode().getId().getId();
-                Location fromLocation = world.getLocation(from);
-                if (fromLocation != null) {
-                    fromLocation.addPath(to);
-                }
-            }
-            return world;
-        } catch (FileNotFoundException e) {
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("File not found: ");
-            errorMsg.append(entitiesFile.getAbsolutePath());
-            System.err.println(errorMsg.toString());
-            e.printStackTrace();
+            // Process paths between locations
+            processPaths(rootGraph, gameWorld);
+            
+            return gameWorld;
+        } catch (FileNotFoundException exception) {
+            logError("File not found: " + entitiesFile.getAbsolutePath(), exception);
             return null;
-        } catch (Exception e) {
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Unexpected error while parsing entities: ");
-            errorMsg.append(e.getMessage());
-            System.err.println(errorMsg.toString());
-            e.printStackTrace();
+        } catch (Exception exception) {
+            logError("Unexpected error while parsing entities: " + exception.getMessage(), exception);
             return null;
         }
+    }
+    
+    /**
+     * Parse the DOT file and return the root graph
+     */
+    private Graph parseGraphFromFile(File dotFile) throws Exception {
+        Parser parser = new Parser();
+        FileReader fileReader = new FileReader(dotFile);
+        parser.parse(fileReader);
+        fileReader.close();
+        return parser.getGraphs().get(0);
+    }
+    
+    /**
+     * Process the locations section of the graph
+     */
+    private void processLocations(Graph rootGraph, GameWorld gameWorld) {
+        Graph locationSection = rootGraph.getSubgraphs().get(0);
+        
+        for (Graph locationGraph : locationSection.getSubgraphs()) {
+            Node locationNode = locationGraph.getNodes(false).get(0);
+            String locationName = locationNode.getId().getId();
+            String locationDescription = locationNode.getAttribute("description");
+
+            Location location = new Location(locationName, locationDescription);
+            gameWorld.addLocation(location);
+
+            // Process entities within this location
+            processLocationEntities(locationGraph, location);
+        }
+    }
+    
+    /**
+     * Process entities (artefacts, furniture, characters) within a location
+     */
+    private void processLocationEntities(Graph locationGraph, Location location) {
+        for (Graph subgraph : locationGraph.getSubgraphs()) {
+            String subgraphType = subgraph.getId().getId();
+            
+            switch (subgraphType) {
+                case "artefacts":
+                    processArtefacts(subgraph, location);
+                    break;
+                case "furniture":
+                    processFurniture(subgraph, location);
+                    break;
+                case "characters":
+                    processCharacters(subgraph, location);
+                    break;
+            }
+        }
+    }
+    
+    /**
+     * Process artefacts in a location
+     */
+    private void processArtefacts(Graph artefactsGraph, Location location) {
+        for (Node artefactNode : artefactsGraph.getNodes(false)) {
+            String artefactName = artefactNode.getId().getId();
+            String artefactDescription = artefactNode.getAttribute("description");
+            
+            Artefact artefact = new Artefact(artefactName, artefactDescription);
+            location.addArtefact(artefact);
+        }
+    }
+    
+    /**
+     * Process furniture in a location
+     */
+    private void processFurniture(Graph furnitureGraph, Location location) {
+        for (Node furnitureNode : furnitureGraph.getNodes(false)) {
+            String furnitureName = furnitureNode.getId().getId();
+            String furnitureDescription = furnitureNode.getAttribute("description");
+            
+            Furniture furniture = new Furniture(furnitureName, furnitureDescription);
+            location.addFurniture(furniture);
+        }
+    }
+    
+    /**
+     * Process characters in a location
+     */
+    private void processCharacters(Graph charactersGraph, Location location) {
+        for (Node characterNode : charactersGraph.getNodes(false)) {
+            String characterName = characterNode.getId().getId();
+            String characterDescription = characterNode.getAttribute("description");
+            
+            GameCharacter character = new GameCharacter(characterName, characterDescription);
+            location.addCharacter(character);
+        }
+    }
+    
+    /**
+     * Process paths between locations
+     */
+    private void processPaths(Graph rootGraph, GameWorld gameWorld) {
+        Graph pathSection = rootGraph.getSubgraphs().get(1);
+        
+        for (Edge edge : pathSection.getEdges()) {
+            String sourceLocationName = edge.getSource().getNode().getId().getId();
+            String targetLocationName = edge.getTarget().getNode().getId().getId();
+            
+            Location sourceLocation = gameWorld.getLocation(sourceLocationName);
+            if (sourceLocation != null) {
+                sourceLocation.addPath(targetLocationName);
+            }
+        }
+    }
+    
+    /**
+     * Log error messages
+     */
+    private void logError(String message, Exception exception) {
+        System.err.println(message);
+        exception.printStackTrace();
     }
 }
 

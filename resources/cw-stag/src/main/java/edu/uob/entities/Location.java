@@ -94,39 +94,95 @@ public class Location extends GameEntity{
     }
 
     public void removeEntity(GameEntity entity){
-        //if this is artefact
-        if(entity instanceof Artefact){
-            artefacts.remove(entity);
-        }
-        //if this is furniture
-        if(entity instanceof Furniture){
-            furniture.remove(entity);
-        }
-        //if this is character
-        if(entity instanceof GameCharacter){
-            characters.remove(entity);
-        }
-        // checker
-        String entityName = entity.getName();
-
-        // check might in there?
-        for(Artefact art : new HashSet<>(artefacts)) {
-            if(art.getName().equalsIgnoreCase(entityName)) {
-                artefacts.remove(art);
+        String entityName = entity.getName().toLowerCase();
+        
+        // 特殊处理: 如果是树木，直接清理furniture集合中的所有树
+        if (entityName.equals("tree")) {
+            System.out.println("SPECIAL TREE REMOVAL: direct removal from furniture collection");
+            Set<Furniture> toRemove = new HashSet<>();
+            for (Furniture f : furniture) {
+                if (f.getName().equalsIgnoreCase("tree")) {
+                    toRemove.add(f);
+                    System.out.println("Marked tree for removal");
+                }
+            }
+            if (!toRemove.isEmpty()) {
+                furniture.removeAll(toRemove);
+                System.out.println("Removed all trees");
+                return;
             }
         }
+        
+        // Debug info
+        System.out.println("Removing entity: " + entityName + " from location: " + getName());
+        
+        // First, try direct removal with object identity
+        boolean removedDirect = false;
+        if (entity instanceof Artefact) {
+            removedDirect = artefacts.remove(entity);
+        } else if (entity instanceof Furniture) {
+            removedDirect = furniture.remove(entity);
+        } else if (entity instanceof GameCharacter) {
+            removedDirect = characters.remove(entity);
+        }
+        
+        // If direct removal failed, try by name with case-insensitive comparison
+        if (!removedDirect) {
+            System.out.println("Direct removal failed, trying by name...");
+            
+            // Create temporary sets to avoid ConcurrentModificationException
+            Set<Artefact> artefactsToRemove = new HashSet<>();
+            Set<Furniture> furnitureToRemove = new HashSet<>();
+            Set<GameCharacter> charactersToRemove = new HashSet<>();
+            
+            // Find entities to remove
+            for (Artefact item : artefacts) {
+                if (item.getName().equalsIgnoreCase(entityName)) {
+                    artefactsToRemove.add(item);
+                }
+            }
+            
+            for (Furniture item : furniture) {
+                if (item.getName().equalsIgnoreCase(entityName)) {
+                    furnitureToRemove.add(item);
+                }
+            }
+            
+            for (GameCharacter item : characters) {
+                if (item.getName().equalsIgnoreCase(entityName)) {
+                    charactersToRemove.add(item);
+                }
+            }
+            
+            // Remove found entities
+            artefacts.removeAll(artefactsToRemove);
+            furniture.removeAll(furnitureToRemove);
+            characters.removeAll(charactersToRemove);
+        }
+        
+        // Verify removal
+        if (hasEntity(entityName)) {
+            System.err.println("WARNING: Entity " + entityName + " still exists after removal attempt!");
+            // Last resort: brute force removal with streams
+            artefacts.removeIf(a -> a.getName().equalsIgnoreCase(entityName));
+            furniture.removeIf(f -> f.getName().equalsIgnoreCase(entityName));
+            characters.removeIf(c -> c.getName().equalsIgnoreCase(entityName));
+        } else {
+            System.out.println("Entity " + entityName + " successfully removed");
+        }
+    }
 
-        for(Furniture furn : new HashSet<>(furniture)) {
-            if(furn.getName().equalsIgnoreCase(entityName)) {
-                furniture.remove(furn);
+    /**
+     * Helper method to remove entities by name from a collection
+     */
+    private <T extends GameEntity> void removeByName(Set<T> collection, String entityName) {
+        Set<T> toRemove = new HashSet<>();
+        for (T item : collection) {
+            if (item.getName().equalsIgnoreCase(entityName)) {
+                toRemove.add(item);
             }
         }
-
-        for(GameCharacter character : new HashSet<>(characters)) {
-            if(character.getName().equalsIgnoreCase(entityName)) {
-                characters.remove(character);
-            }
-        }
+        collection.removeAll(toRemove);
     }
 
     //helper
