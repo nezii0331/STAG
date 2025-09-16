@@ -7,7 +7,8 @@ Supports both **basic** and **custom** actions defined via external configuratio
 
 ##  Project Structure
 
-📁```bash
+📁
+```bash
 cw-stag/
 ├── config/
 │   ├── basic-entities.dot      # Entity and location definitions
