@@ -5,9 +5,9 @@ Supports both **basic** and **custom** actions defined via external configuratio
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
-```bash
+📁```bash
 cw-stag/
 ├── config/
 │   ├── basic-entities.dot      # Entity and location definitions
@@ -41,9 +41,9 @@ cw-stag/
 
 ---
 
-## ⚙️ How It Works
+##  How It Works
 
-### Command Lifecycle (Client → Server → Result)
+### ⚙️Command Lifecycle (Client → Server → Result)
 
 ```mermaid
 sequenceDiagram
@@ -83,7 +83,7 @@ java -cp target/classes edu.uob.GameClient yourname
 
 ---
 
-## 🧪 Sample Commands
+##  Sample Commands
 
 ```bash
 look
@@ -140,7 +140,7 @@ Defined in `basic-actions.xml` using:
 
 ---
 
-## 📌 Author
+##  Author
 
 Created by **Negi Chen**  
 University of Bristol – COMS Coursework  
